@@ -30,13 +30,7 @@ To use the DocDigitizer API, you need an API key. Request one at:
 
 **https://docdigitizer.com/contact**
 
-### Step 5: Set your API key
-
-```powershell
-$env:DOCDIGITIZER_APIKEY = "your-api-key-here"
-```
-
-### Step 6: Import the module
+### Step 5: Import the module
 
 ```powershell
 Import-Module .\dd-cmdlets\DocDigitizer.psd1
@@ -45,6 +39,18 @@ Import-Module .\dd-cmdlets\DocDigitizer.psd1
 You should see:
 ```
 [DocDigitizer] Module loaded - 5 commands available
+```
+
+### Step 6: Set your API key
+
+```powershell
+Set-DocDigitizerConfig -ApiKey "your-api-key-here"
+```
+
+To save it permanently (so you don't have to set it every time):
+
+```powershell
+Set-DocDigitizerConfig -ApiKey "your-api-key-here" -Persist
 ```
 
 ### Step 7: Test the connection

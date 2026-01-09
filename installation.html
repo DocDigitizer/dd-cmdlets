@@ -65,15 +65,17 @@ cd C:\Tools</code></pre>
     <p>To use the DocDigitizer API, you need an API key. Request one at:</p>
     <p><strong><a href="https://docdigitizer.com/contact">https://docdigitizer.com/contact</a></strong></p>
 
-    <h3>Step 6: Set your API key</h3>
-    <p>Set your API key as an environment variable:</p>
-    <pre><code>$env:DOCDIGITIZER_APIKEY = "your-api-key-here"</code></pre>
-
-    <h3>Step 7: Import the module</h3>
+    <h3>Step 6: Import the module</h3>
     <p>Load the module into PowerShell:</p>
     <pre><code>Import-Module .\dd-cmdlets\DocDigitizer.psd1</code></pre>
     <p>You should see this message:</p>
     <pre><code>[DocDigitizer] Module loaded - 5 commands available</code></pre>
+
+    <h3>Step 7: Set your API key</h3>
+    <p>Configure your API key:</p>
+    <pre><code>Set-DocDigitizerConfig -ApiKey "your-api-key-here"</code></pre>
+    <p>To save it permanently (so you don't have to set it every time):</p>
+    <pre><code>Set-DocDigitizerConfig -ApiKey "your-api-key-here" -Persist</code></pre>
 
     <h3>Step 8: Test the connection</h3>
     <p>Verify everything is working:</p>
@@ -91,10 +93,10 @@ Latency   : ...</code></pre>
     <hr>
 
     <h2>Using the Module in Future Sessions</h2>
-    <p>Every time you open a new PowerShell window, you need to set your API key and import the module:</p>
-    <pre><code>$env:DOCDIGITIZER_APIKEY = "your-api-key-here"
-Import-Module C:\Tools\dd-cmdlets\DocDigitizer.psd1</code></pre>
-    <p><strong>Tip:</strong> Add these lines to your PowerShell profile to run them automatically.</p>
+    <p>If you used <code>-Persist</code> when setting your API key, it will be saved automatically.</p>
+    <p>Otherwise, each time you open PowerShell, import the module and set your key:</p>
+    <pre><code>Import-Module C:\Tools\dd-cmdlets\DocDigitizer.psd1
+Set-DocDigitizerConfig -ApiKey "your-api-key-here"</code></pre>
 
     <hr>
 

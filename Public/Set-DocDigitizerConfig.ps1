@@ -7,8 +7,11 @@ function Set-DocDigitizerConfig {
         Configures default values for the DocDigitizer module by setting
         environment variables. These persist for the current PowerShell session.
 
+    .PARAMETER ApiKey
+        Your DocDigitizer API key. Get one at https://docdigitizer.com/contact
+
     .PARAMETER BaseUrl
-        Default base URL for the DocIngester API.
+        Default base URL for the DocDigitizer API.
 
     .PARAMETER Pipeline
         Default pipeline name to use for document processing.
@@ -22,6 +25,16 @@ function Set-DocDigitizerConfig {
     .PARAMETER Persist
         If specified, saves configuration to user profile for future sessions.
         Creates/updates $PROFILE with environment variable settings.
+
+    .EXAMPLE
+        Set-DocDigitizerConfig -ApiKey "your-api-key-here"
+
+        Sets your API key for the current session.
+
+    .EXAMPLE
+        Set-DocDigitizerConfig -ApiKey "your-api-key-here" -Persist
+
+        Sets your API key and saves it to your PowerShell profile.
 
     .EXAMPLE
         Set-DocDigitizerConfig -BaseUrl "https://api.example.com"
@@ -40,6 +53,9 @@ function Set-DocDigitizerConfig {
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
+        [Parameter()]
+        [string]$ApiKey,
+
         [Parameter()]
         [string]$BaseUrl,
 
@@ -61,6 +77,12 @@ function Set-DocDigitizerConfig {
     Write-CommandLog -CommandName 'Set-DocDigitizerConfig' -Message 'Updating configuration'
 
     $changes = @()
+
+    if ($ApiKey) {
+        $env:DOCDIGITIZER_APIKEY = $ApiKey
+        $changes += "DOCDIGITIZER_APIKEY=********"
+        Write-Verbose "Set DOCDIGITIZER_APIKEY"
+    }
 
     if ($BaseUrl) {
         $env:DOCDIGITIZER_URL = $BaseUrl
@@ -99,6 +121,7 @@ function Set-DocDigitizerConfig {
             $profileContent = @"
 
 # DocDigitizer PowerShell Module Configuration
+`$env:DOCDIGITIZER_APIKEY = '$($env:DOCDIGITIZER_APIKEY)'
 `$env:DOCDIGITIZER_URL = '$($env:DOCDIGITIZER_URL)'
 `$env:DOCDIGITIZER_PIPELINE = '$($env:DOCDIGITIZER_PIPELINE)'
 `$env:DOCDIGITIZER_LOGLEVEL = '$($env:DOCDIGITIZER_LOGLEVEL)'
