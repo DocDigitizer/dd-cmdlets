@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocDigitizer PowerShell Module - Installation Guide</title>
+</head>
+<body>
+    <h1>DocDigitizer PowerShell Module</h1>
+    <h2>Installation Guide</h2>
+
+    <nav>
+        <p>
+            <a href="installation.html">Installation</a> |
+            <a href="commands.html">Commands Reference</a> |
+            <a href="examples.html">Scripting Examples</a>
+        </p>
+    </nav>
+
+    <hr>
+
+    <h3>Requirements</h3>
+    <ul>
+        <li>PowerShell 5.1 or later (PowerShell 7+ recommended for better performance)</li>
+        <li>Network access to DocDigitizer API</li>
+    </ul>
+
+    <h3>Option 1: Import Directly from Folder</h3>
+    <p>The simplest method - import the module directly from its location:</p>
+    <pre><code>Import-Module "C:\path\to\Tools\DocDigitizer.PowerShell\DocDigitizer.psd1"</code></pre>
+
+    <h3>Option 2: Copy to PowerShell Modules Folder</h3>
+    <p>Copy the module to your user modules folder for easier access:</p>
+    <pre><code># Copy to user modules folder
+$modulePath = "$env:USERPROFILE\Documents\PowerShell\Modules\DocDigitizer"
+Copy-Item -Path ".\Tools\DocDigitizer.PowerShell" -Destination $modulePath -Recurse
+
+# Then import
+Import-Module DocDigitizer</code></pre>
+
+    <h3>Option 3: Add to PSModulePath</h3>
+    <p>Add the module location to your PowerShell module path:</p>
+    <pre><code>$env:PSModulePath += ";C:\path\to\Tools\DocDigitizer.PowerShell"
+Import-Module DocDigitizer</code></pre>
+
+    <h3>Verify Installation</h3>
+    <p>After importing, verify the module is loaded:</p>
+    <pre><code># Check available commands
+Get-Command -Module DocDigitizer
+
+# Test connectivity
+Test-DocDigitizerConnection</code></pre>
+
+    <h3>Configuration</h3>
+    <p>The module comes pre-configured with default settings. You can customize using environment variables:</p>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Variable</th>
+                <th>Description</th>
+                <th>Default</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>DOCDIGITIZER_URL</code></td>
+                <td>API base URL</td>
+                <td>https://apix.docdigitizer.com/sync</td>
+            </tr>
+            <tr>
+                <td><code>DOCDIGITIZER_APIKEY</code></td>
+                <td>API key for authentication</td>
+                <td>(built-in default)</td>
+            </tr>
+            <tr>
+                <td><code>DOCDIGITIZER_PIPELINE</code></td>
+                <td>Default pipeline name</td>
+                <td>(server default)</td>
+            </tr>
+            <tr>
+                <td><code>DOCDIGITIZER_LOGLEVEL</code></td>
+                <td>Default log level</td>
+                <td>Minimal</td>
+            </tr>
+            <tr>
+                <td><code>DOCDIGITIZER_TIMEOUT</code></td>
+                <td>Request timeout (seconds)</td>
+                <td>300</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Troubleshooting</h3>
+
+    <h4>Module Not Found</h4>
+    <p>If you get "module not found" errors, ensure the path is correct:</p>
+    <pre><code># Check if the file exists
+Test-Path "C:\path\to\DocDigitizer.psd1"
+
+# Use the full path when importing
+Import-Module "C:\full\path\to\DocDigitizer.psd1"</code></pre>
+
+    <h4>Connection Issues</h4>
+    <pre><code># Test with verbose output
+Test-DocDigitizerConnection -Verbose
+
+# Check current configuration
+Get-DocDigitizerConfig</code></pre>
+
+    <hr>
+    <p><a href="commands.html">Next: Commands Reference</a></p>
+</body>
+</html>

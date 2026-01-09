@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocDigitizer PowerShell Module - Commands Reference</title>
+</head>
+<body>
+    <h1>DocDigitizer PowerShell Module</h1>
+    <h2>Commands Reference</h2>
+
+    <nav>
+        <p>
+            <a href="installation.html">Installation</a> |
+            <a href="commands.html">Commands Reference</a> |
+            <a href="examples.html">Scripting Examples</a>
+        </p>
+    </nav>
+
+    <hr>
+
+    <h3>Available Commands</h3>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Command</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#send-docdigitizerdocument"><code>Send-DocDigitizerDocument</code></a></td>
+                <td>Send a PDF document for processing</td>
+            </tr>
+            <tr>
+                <td><a href="#test-docdigitizerconnection"><code>Test-DocDigitizerConnection</code></a></td>
+                <td>Test API connectivity</td>
+            </tr>
+            <tr>
+                <td><a href="#get-docdigitizerconfig"><code>Get-DocDigitizerConfig</code></a></td>
+                <td>View current configuration</td>
+            </tr>
+            <tr>
+                <td><a href="#set-docdigitizerconfig"><code>Set-DocDigitizerConfig</code></a></td>
+                <td>Set default configuration values</td>
+            </tr>
+            <tr>
+                <td><a href="#get-docdigitizerhelp"><code>Get-DocDigitizerHelp</code></a></td>
+                <td>Show help and usage examples</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h3 id="send-docdigitizerdocument">Send-DocDigitizerDocument</h3>
+    <p>Sends a PDF document to the DocDigitizer API for OCR, classification, and data extraction.</p>
+
+    <h4>Syntax</h4>
+    <pre><code>Send-DocDigitizerDocument
+    -FilePath &lt;string&gt;
+    [-DocumentId &lt;guid&gt;]
+    [-ContextId &lt;guid&gt;]
+    [-Pipeline &lt;string&gt;]
+    [-LogLevel &lt;string&gt;]
+    [-BaseUrl &lt;string&gt;]
+    [-TimeoutSec &lt;int&gt;]
+    [-SaveExtraction]
+    [-OutputPath &lt;string&gt;]
+    [-Depth &lt;int&gt;]</code></pre>
+
+    <h4>Parameters</h4>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>-FilePath</code></td>
+                <td>Yes</td>
+                <td>Path to the PDF file to process. Accepts pipeline input.</td>
+            </tr>
+            <tr>
+                <td><code>-DocumentId</code></td>
+                <td>No</td>
+                <td>Unique identifier for the document (GUID). Auto-generated if not provided.</td>
+            </tr>
+            <tr>
+                <td><code>-ContextId</code></td>
+                <td>No</td>
+                <td>Context identifier for grouping related documents (GUID). Auto-generated if not provided.</td>
+            </tr>
+            <tr>
+                <td><code>-Pipeline</code></td>
+                <td>No</td>
+                <td>Name of the pipeline to execute (e.g., MainPipelineWithOCR, MainPipelineWithFile).</td>
+            </tr>
+            <tr>
+                <td><code>-LogLevel</code></td>
+                <td>No</td>
+                <td>Response verbosity: Minimal, Medium, or Full.</td>
+            </tr>
+            <tr>
+                <td><code>-BaseUrl</code></td>
+                <td>No</td>
+                <td>Override the default API URL.</td>
+            </tr>
+            <tr>
+                <td><code>-TimeoutSec</code></td>
+                <td>No</td>
+                <td>Request timeout in seconds. Default: 300.</td>
+            </tr>
+            <tr>
+                <td><code>-SaveExtraction</code></td>
+                <td>No</td>
+                <td>Save result to {filename}_extraction.json in the same directory.</td>
+            </tr>
+            <tr>
+                <td><code>-OutputPath</code></td>
+                <td>No</td>
+                <td>Custom path to save the JSON result.</td>
+            </tr>
+            <tr>
+                <td><code>-Depth</code></td>
+                <td>No</td>
+                <td>JSON serialization depth. Default: 20.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Output</h4>
+    <p>Returns a JSON string containing:</p>
+    <pre><code>{
+  "traceId": "ABC1234",
+  "state": "PROCESSINGX",
+  "pipeline": "MainPipelineWithOCR",
+  "pageCount": 3,
+  "filePath": "C:\\docs\\invoice.pdf",
+  "documentId": "a1b2c3d4-...",
+  "contextId": "e5f6g7h8-...",
+  "output": {
+    "extractions": [...]
+  },
+  "timers": {
+    "DocIngester_Total": 1234.56,
+    "DocWorker_Total": 1200.00
+  }
+}</code></pre>
+
+    <hr>
+
+    <h3 id="test-docdigitizerconnection">Test-DocDigitizerConnection</h3>
+    <p>Tests the connection to the DocDigitizer API.</p>
+
+    <h4>Syntax</h4>
+    <pre><code>Test-DocDigitizerConnection
+    [-BaseUrl &lt;string&gt;]
+    [-Quiet]</code></pre>
+
+    <h4>Parameters</h4>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>-BaseUrl</code></td>
+                <td>No</td>
+                <td>Override the default API URL.</td>
+            </tr>
+            <tr>
+                <td><code>-Quiet</code></td>
+                <td>No</td>
+                <td>Returns only $true or $false instead of detailed status.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Output</h4>
+    <pre><code>Url       : https://apix.docdigitizer.com/sync
+Connected : True
+Response  : I am alive
+Error     :
+Latency   : 45</code></pre>
+
+    <hr>
+
+    <h3 id="get-docdigitizerconfig">Get-DocDigitizerConfig</h3>
+    <p>Displays the current configuration values for the DocDigitizer module.</p>
+
+    <h4>Syntax</h4>
+    <pre><code>Get-DocDigitizerConfig</code></pre>
+
+    <h4>Output</h4>
+    <pre><code>BaseUrl         : https://apix.docdigitizer.com/sync
+BaseUrlSource   : Default
+Pipeline        : (not set - will use server default)
+PipelineSource  : Default
+LogLevel        : (not set - will use Minimal)
+LogLevelSource  : Default
+Timeout         : 300
+TimeoutSource   : Default</code></pre>
+
+    <hr>
+
+    <h3 id="set-docdigitizerconfig">Set-DocDigitizerConfig</h3>
+    <p>Sets default configuration values for the DocDigitizer module.</p>
+
+    <h4>Syntax</h4>
+    <pre><code>Set-DocDigitizerConfig
+    [-BaseUrl &lt;string&gt;]
+    [-Pipeline &lt;string&gt;]
+    [-LogLevel &lt;string&gt;]
+    [-Timeout &lt;int&gt;]
+    [-Persist]</code></pre>
+
+    <h4>Parameters</h4>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>-BaseUrl</code></td>
+                <td>No</td>
+                <td>Default base URL for the API.</td>
+            </tr>
+            <tr>
+                <td><code>-Pipeline</code></td>
+                <td>No</td>
+                <td>Default pipeline name.</td>
+            </tr>
+            <tr>
+                <td><code>-LogLevel</code></td>
+                <td>No</td>
+                <td>Default log level: Minimal, Medium, or Full.</td>
+            </tr>
+            <tr>
+                <td><code>-Timeout</code></td>
+                <td>No</td>
+                <td>Default timeout in seconds (10-3600).</td>
+            </tr>
+            <tr>
+                <td><code>-Persist</code></td>
+                <td>No</td>
+                <td>Save configuration to PowerShell profile for future sessions.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h3 id="get-docdigitizerhelp">Get-DocDigitizerHelp</h3>
+    <p>Displays help information and usage examples for the module.</p>
+
+    <h4>Syntax</h4>
+    <pre><code>Get-DocDigitizerHelp</code></pre>
+
+    <hr>
+    <p><a href="installation.html">Previous: Installation</a> | <a href="examples.html">Next: Scripting Examples</a></p>
+</body>
+</html>

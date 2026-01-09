@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocDigitizer PowerShell Module - Scripting Examples</title>
+</head>
+<body>
+    <h1>DocDigitizer PowerShell Module</h1>
+    <h2>Scripting Examples</h2>
+
+    <nav>
+        <p>
+            <a href="installation.html">Installation</a> |
+            <a href="commands.html">Commands Reference</a> |
+            <a href="examples.html">Scripting Examples</a>
+        </p>
+    </nav>
+
+    <hr>
+
+    <h3>Quick Start</h3>
+    <pre><code># Import the module
+Import-Module .\Tools\DocDigitizer.PowerShell\DocDigitizer.psd1
+
+# Test connection
+Test-DocDigitizerConnection
+
+# Process a document (returns JSON)
+Send-DocDigitizerDocument -FilePath "invoice.pdf"
+
+# Process and auto-save to invoice_extraction.json
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -SaveExtraction</code></pre>
+
+    <hr>
+
+    <h3>Basic Document Processing</h3>
+
+    <h4>Process a Single Document</h4>
+    <pre><code># Simple processing - returns JSON
+Send-DocDigitizerDocument -FilePath "invoice.pdf"
+
+# Process with specific IDs for tracking
+$docId = [guid]::NewGuid()
+$contextId = [guid]::NewGuid()
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -DocumentId $docId -ContextId $contextId</code></pre>
+
+    <h4>Save Results to File</h4>
+    <pre><code># Auto-save to {filename}_extraction.json in same directory
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -SaveExtraction
+# Creates: invoice_extraction.json
+
+# Save to custom path
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -OutputPath "C:\results\my_result.json"</code></pre>
+
+    <hr>
+
+    <h3>Pipeline Selection</h3>
+    <pre><code># Use a specific pipeline
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -Pipeline "MainPipelineWithOCR"
+
+# Available pipelines (check your server):
+# - MainPipelineWithOCR      (OCR + extraction)
+# - MainPipelineWithFile     (extraction only, for searchable PDFs)
+# - SingleDocPipelineWithOCR
+# - SingleDocPipelineWithFile</code></pre>
+
+    <hr>
+
+    <h3>Response Verbosity</h3>
+    <pre><code># Minimal response (default) - just essential data
+Send-DocDigitizerDocument -FilePath "invoice.pdf"
+
+# Medium response - includes metadata
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -LogLevel Medium
+
+# Full response - complete execution details
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -LogLevel Full</code></pre>
+
+    <hr>
+
+    <h3>Batch Processing</h3>
+
+    <h4>Process All PDFs in a Folder</h4>
+    <pre><code># Process all PDFs with the same context ID (groups them together)
+$contextId = [guid]::NewGuid()
+Get-ChildItem *.pdf | Send-DocDigitizerDocument -ContextId $contextId</code></pre>
+
+    <h4>Process and Save All Results</h4>
+    <pre><code># Process all PDFs and save each result alongside the original
+Get-ChildItem *.pdf | Send-DocDigitizerDocument -SaveExtraction</code></pre>
+
+    <h4>Collect Results for Further Processing</h4>
+    <pre><code># Collect all results into a variable
+$results = Get-ChildItem *.pdf | Send-DocDigitizerDocument -ContextId $contextId
+
+# Export summary to CSV
+$results | ForEach-Object { $_ | ConvertFrom-Json } |
+    Select-Object traceId, state, pageCount, filePath |
+    Export-Csv -Path "processing_summary.csv" -NoTypeInformation</code></pre>
+
+    <hr>
+
+    <h3>Working with JSON Results</h3>
+    <pre><code># Get JSON result
+$json = Send-DocDigitizerDocument -FilePath "invoice.pdf"
+
+# Parse JSON to PowerShell object
+$result = $json | ConvertFrom-Json
+
+# Access specific fields
+$result.traceId
+$result.output.extractions
+$result.timers
+
+# Pretty-print the output
+$result.output | ConvertTo-Json -Depth 10</code></pre>
+
+    <hr>
+
+    <h3>Health Check and Connectivity</h3>
+    <pre><code># Detailed connection test
+Test-DocDigitizerConnection
+
+# Simple boolean check for scripts
+if (Test-DocDigitizerConnection -Quiet) {
+    Write-Host "API is available"
+    Send-DocDigitizerDocument -FilePath "invoice.pdf"
+} else {
+    Write-Host "API is not available"
+}</code></pre>
+
+    <hr>
+
+    <h3>Configuration Management</h3>
+
+    <h4>View Current Configuration</h4>
+    <pre><code>Get-DocDigitizerConfig</code></pre>
+
+    <h4>Set Configuration for Current Session</h4>
+    <pre><code># Set pipeline and log level
+Set-DocDigitizerConfig -Pipeline "MainPipelineWithOCR" -LogLevel Full
+
+# Set custom timeout for large documents
+Set-DocDigitizerConfig -Timeout 600</code></pre>
+
+    <h4>Persist Configuration</h4>
+    <pre><code># Save to PowerShell profile (survives session restarts)
+Set-DocDigitizerConfig -Pipeline "MainPipelineWithOCR" -Persist</code></pre>
+
+    <h4>Use Different Environments</h4>
+    <pre><code># Switch to local development server
+Set-DocDigitizerConfig -BaseUrl "http://localhost:5000"
+
+# Switch back to production
+Set-DocDigitizerConfig -BaseUrl "https://apix.docdigitizer.com/sync"
+
+# One-off call to different server (without changing config)
+Send-DocDigitizerDocument -FilePath "doc.pdf" -BaseUrl "http://localhost:5000"</code></pre>
+
+    <hr>
+
+    <h3>Error Handling</h3>
+
+    <h4>Silent Error Handling</h4>
+    <pre><code># Continue on error, check result
+$result = Send-DocDigitizerDocument -FilePath "document.pdf" -ErrorAction SilentlyContinue
+if (-not $result) {
+    Write-Host "Processing failed"
+}</code></pre>
+
+    <h4>Try/Catch Error Handling</h4>
+    <pre><code>try {
+    $result = Send-DocDigitizerDocument -FilePath "document.pdf" -ErrorAction Stop
+    Write-Host "Success! TraceId: $(($result | ConvertFrom-Json).traceId)"
+} catch {
+    Write-Host "Error: $($_.Exception.Message)"
+}</code></pre>
+
+    <h4>Batch Processing with Error Handling</h4>
+    <pre><code>$files = Get-ChildItem *.pdf
+$successful = @()
+$failed = @()
+
+foreach ($file in $files) {
+    try {
+        $result = Send-DocDigitizerDocument -FilePath $file.FullName -ErrorAction Stop
+        $successful += @{ File = $file.Name; Result = $result }
+    } catch {
+        $failed += @{ File = $file.Name; Error = $_.Exception.Message }
+    }
+}
+
+Write-Host "Processed: $($successful.Count) successful, $($failed.Count) failed"</code></pre>
+
+    <hr>
+
+    <h3>Advanced Scripting</h3>
+
+    <h4>Process Documents from a List</h4>
+    <pre><code># Read file paths from a text file
+$files = Get-Content "documents_to_process.txt"
+$contextId = [guid]::NewGuid()
+
+$files | ForEach-Object {
+    if (Test-Path $_) {
+        Send-DocDigitizerDocument -FilePath $_ -ContextId $contextId -SaveExtraction
+    } else {
+        Write-Warning "File not found: $_"
+    }
+}</code></pre>
+
+    <h4>Scheduled Processing Script</h4>
+    <pre><code># watch_folder.ps1 - Process new PDFs in a folder
+param(
+    [string]$WatchFolder = "C:\Incoming",
+    [string]$ProcessedFolder = "C:\Processed"
+)
+
+Import-Module DocDigitizer
+
+$pdfs = Get-ChildItem $WatchFolder -Filter "*.pdf"
+
+foreach ($pdf in $pdfs) {
+    Write-Host "Processing: $($pdf.Name)"
+
+    try {
+        Send-DocDigitizerDocument -FilePath $pdf.FullName -SaveExtraction -ErrorAction Stop
+        Move-Item $pdf.FullName $ProcessedFolder
+        Write-Host "  Done - moved to processed folder"
+    } catch {
+        Write-Warning "  Failed: $($_.Exception.Message)"
+    }
+}</code></pre>
+
+    <h4>Generate Processing Report</h4>
+    <pre><code># Generate an HTML report of processed documents
+$results = Get-ChildItem *.pdf | Send-DocDigitizerDocument -ContextId ([guid]::NewGuid())
+
+$report = $results | ForEach-Object {
+    $r = $_ | ConvertFrom-Json
+    [PSCustomObject]@{
+        File = Split-Path $r.filePath -Leaf
+        TraceId = $r.traceId
+        State = $r.state
+        Pages = $r.pageCount
+        Duration = "$([math]::Round($r.timers.'DocWorker_Total' / 1000, 2))s"
+    }
+}
+
+$report | ConvertTo-Html -Title "Processing Report" | Out-File "report.html"
+Write-Host "Report saved to report.html"</code></pre>
+
+    <hr>
+    <p><a href="commands.html">Previous: Commands Reference</a> | <a href="installation.html">Back to Installation</a></p>
+</body>
+</html>
