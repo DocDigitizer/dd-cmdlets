@@ -192,8 +192,8 @@ function Send-DocDigitizerDocument {
                 $result.pluginExecutions = $pluginExecutions
             }
 
-            # Convert to JSON (compressed for cleaner output)
-            $json = $result | ConvertTo-Json -Depth $Depth -Compress
+            # Convert to JSON
+            $json = $result | ConvertTo-Json -Depth $Depth
 
             # Determine output file path
             $savePath = $null
