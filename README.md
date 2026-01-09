@@ -4,35 +4,41 @@ A PowerShell module for interacting with the DocDigitizer document processing AP
 
 ## Installation
 
-### Option 1: Import directly from folder
+### Option 1: Clone and Import
 
 ```powershell
-Import-Module "C:\path\to\Tools\DocDigitizer.PowerShell\DocDigitizer.psd1"
+# Clone the repository
+git clone https://github.com/DocDigitizer/dd-cmdlets.git
+
+# Import the module
+Import-Module ".\dd-cmdlets\DocDigitizer.psd1"
 ```
 
-### Option 2: Copy to PowerShell modules folder
+### Option 2: Install to PowerShell Modules folder
 
 ```powershell
-# Copy to user modules folder
-$modulePath = "$env:USERPROFILE\Documents\PowerShell\Modules\DocDigitizer"
-Copy-Item -Path ".\Tools\DocDigitizer.PowerShell" -Destination $modulePath -Recurse
+# Clone directly to user modules folder
+git clone https://github.com/DocDigitizer/dd-cmdlets.git "$env:USERPROFILE\Documents\PowerShell\Modules\DocDigitizer"
 
-# Then import
+# Then import (no path needed)
 Import-Module DocDigitizer
 ```
 
-### Option 3: Add to PSModulePath
+### Option 3: Download ZIP
+
+1. Download from https://github.com/DocDigitizer/dd-cmdlets/archive/refs/heads/master.zip
+2. Extract to a folder of your choice
+3. Import the module:
 
 ```powershell
-$env:PSModulePath += ";C:\path\to\Tools\DocDigitizer.PowerShell"
-Import-Module DocDigitizer
+Import-Module "C:\path\to\dd-cmdlets\DocDigitizer.psd1"
 ```
 
 ## Quick Start
 
 ```powershell
 # Import the module
-Import-Module .\Tools\DocDigitizer.PowerShell\DocDigitizer.psd1
+Import-Module .\dd-cmdlets\DocDigitizer.psd1
 
 # Test connection
 Test-DocDigitizerConnection

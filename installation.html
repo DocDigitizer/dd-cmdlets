@@ -25,23 +25,30 @@
         <li>Network access to DocDigitizer API</li>
     </ul>
 
-    <h3>Option 1: Import Directly from Folder</h3>
-    <p>The simplest method - import the module directly from its location:</p>
-    <pre><code>Import-Module "C:\path\to\Tools\DocDigitizer.PowerShell\DocDigitizer.psd1"</code></pre>
+    <h3>Option 1: Clone and Import</h3>
+    <p>Clone the repository and import the module:</p>
+    <pre><code># Clone the repository
+git clone https://github.com/DocDigitizer/dd-cmdlets.git
 
-    <h3>Option 2: Copy to PowerShell Modules Folder</h3>
-    <p>Copy the module to your user modules folder for easier access:</p>
-    <pre><code># Copy to user modules folder
-$modulePath = "$env:USERPROFILE\Documents\PowerShell\Modules\DocDigitizer"
-Copy-Item -Path ".\Tools\DocDigitizer.PowerShell" -Destination $modulePath -Recurse
+# Import the module
+Import-Module ".\dd-cmdlets\DocDigitizer.psd1"</code></pre>
 
-# Then import
+    <h3>Option 2: Install to PowerShell Modules Folder</h3>
+    <p>Clone directly to your user modules folder for easier access:</p>
+    <pre><code># Clone directly to user modules folder
+git clone https://github.com/DocDigitizer/dd-cmdlets.git "$env:USERPROFILE\Documents\PowerShell\Modules\DocDigitizer"
+
+# Then import (no path needed)
 Import-Module DocDigitizer</code></pre>
 
-    <h3>Option 3: Add to PSModulePath</h3>
-    <p>Add the module location to your PowerShell module path:</p>
-    <pre><code>$env:PSModulePath += ";C:\path\to\Tools\DocDigitizer.PowerShell"
-Import-Module DocDigitizer</code></pre>
+    <h3>Option 3: Download ZIP</h3>
+    <p>Download and extract the module manually:</p>
+    <ol>
+        <li>Download from <a href="https://github.com/DocDigitizer/dd-cmdlets/archive/refs/heads/master.zip">GitHub</a></li>
+        <li>Extract to a folder of your choice</li>
+        <li>Import the module:</li>
+    </ol>
+    <pre><code>Import-Module "C:\path\to\dd-cmdlets\DocDigitizer.psd1"</code></pre>
 
     <h3>Verify Installation</h3>
     <p>After importing, verify the module is loaded:</p>
