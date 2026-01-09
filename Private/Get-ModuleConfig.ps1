@@ -11,7 +11,7 @@ function Get-ModuleConfig {
 
     $config = @{
         BaseUrl  = if ($env:DOCDIGITIZER_URL) { $env:DOCDIGITIZER_URL } else { "https://apix.docdigitizer.com/sync" }
-        ApiKey   = if ($env:DOCDIGITIZER_APIKEY) { $env:DOCDIGITIZER_APIKEY } else { "YOUR_API_KEY_HERE" }
+        ApiKey   = $env:DOCDIGITIZER_APIKEY
         Pipeline = if ($env:DOCDIGITIZER_PIPELINE) { $env:DOCDIGITIZER_PIPELINE } else { $null }
         LogLevel = if ($env:DOCDIGITIZER_LOGLEVEL) { $env:DOCDIGITIZER_LOGLEVEL } else { $null }
         Timeout  = if ($env:DOCDIGITIZER_TIMEOUT) { [int]$env:DOCDIGITIZER_TIMEOUT } else { 300 }

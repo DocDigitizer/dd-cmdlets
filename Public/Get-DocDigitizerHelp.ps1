@@ -174,6 +174,7 @@ function Get-DocDigitizerHelp {
 
     Write-Host "ENVIRONMENT VARIABLES" -ForegroundColor Yellow
     Write-Host "---------------------"
+    Write-Host "  DOCDIGITIZER_APIKEY   - Your API key (required - get one at docdigitizer.com/contact)"
     Write-Host "  DOCDIGITIZER_URL      - API base URL (default: https://apix.docdigitizer.com/sync)"
     Write-Host "  DOCDIGITIZER_PIPELINE - Default pipeline name"
     Write-Host "  DOCDIGITIZER_LOGLEVEL - Default log level (Minimal/Medium/Full)"

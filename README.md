@@ -24,7 +24,19 @@ git clone https://github.com/DocDigitizer/dd-cmdlets.git
 
 This creates a `dd-cmdlets` folder with all the module files.
 
-### Step 4: Import the module
+### Step 4: Get your API key
+
+To use the DocDigitizer API, you need an API key. Request one at:
+
+**https://docdigitizer.com/contact**
+
+### Step 5: Set your API key
+
+```powershell
+$env:DOCDIGITIZER_APIKEY = "your-api-key-here"
+```
+
+### Step 6: Import the module
 
 ```powershell
 Import-Module .\dd-cmdlets\DocDigitizer.psd1
@@ -35,7 +47,7 @@ You should see:
 [DocDigitizer] Module loaded - 5 commands available
 ```
 
-### Step 5: Test the connection
+### Step 7: Test the connection
 
 ```powershell
 Test-DocDigitizerConnection
