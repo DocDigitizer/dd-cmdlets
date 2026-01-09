@@ -1,278 +1,192 @@
 # DocDigitizer PowerShell Module
 
-A PowerShell module for interacting with the DocDigitizer document processing API.
+A PowerShell module for processing documents with the DocDigitizer API. Extract data from invoices, receipts, and other documents using OCR and AI.
 
 ## Installation
 
-### Option 1: Clone and Import
+### Step 1: Open PowerShell
+
+Open **PowerShell** or **Windows Terminal** on your computer.
+
+### Step 2: Choose a folder for the module
+
+Navigate to where you want to install the module. For example:
 
 ```powershell
-# Clone the repository
+cd C:\Tools
+```
+
+### Step 3: Clone the repository
+
+```powershell
 git clone https://github.com/DocDigitizer/dd-cmdlets.git
-
-# Import the module
-Import-Module ".\dd-cmdlets\DocDigitizer.psd1"
 ```
 
-### Option 2: Install to PowerShell Modules folder
+This creates a `dd-cmdlets` folder with all the module files.
+
+### Step 4: Import the module
 
 ```powershell
-# Clone directly to user modules folder
-git clone https://github.com/DocDigitizer/dd-cmdlets.git "$env:USERPROFILE\Documents\PowerShell\Modules\DocDigitizer"
-
-# Then import (no path needed)
-Import-Module DocDigitizer
+Import-Module .\dd-cmdlets\DocDigitizer.psd1
 ```
 
-### Option 3: Download ZIP
+You should see:
+```
+[DocDigitizer] Module loaded - 5 commands available
+```
 
-1. Download from https://github.com/DocDigitizer/dd-cmdlets/archive/refs/heads/master.zip
-2. Extract to a folder of your choice
-3. Import the module:
+### Step 5: Test the connection
 
 ```powershell
-Import-Module "C:\path\to\dd-cmdlets\DocDigitizer.psd1"
+Test-DocDigitizerConnection
 ```
+
+You should see:
+```
+Url       : https://apix.docdigitizer.com/sync
+Connected : True
+Response  : I am alive
+Latency   : ...
+```
+
+**Done!** You're ready to process documents.
+
+---
 
 ## Quick Start
 
+### Process a document
+
 ```powershell
-# Import the module
-Import-Module .\dd-cmdlets\DocDigitizer.psd1
-
-# Test connection
-Test-DocDigitizerConnection
-
-# Process a document (returns JSON)
-Send-DocDigitizerDocument -FilePath "invoice.pdf"
-
-# Process and auto-save to invoice_extraction.json
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -SaveExtraction
+Send-DocDigitizerDocument -FilePath "C:\Documents\invoice.pdf"
 ```
+
+### Process and save the result
+
+```powershell
+Send-DocDigitizerDocument -FilePath "C:\Documents\invoice.pdf" -SaveExtraction
+```
+
+This creates `invoice_extraction.json` in the same folder as your PDF.
+
+### Process multiple documents
+
+```powershell
+Get-ChildItem "C:\Documents\*.pdf" | Send-DocDigitizerDocument -SaveExtraction
+```
+
+---
 
 ## Available Commands
 
-| Command                       | Description                        |
-| ----------------------------- | ---------------------------------- |
-| `Send-DocDigitizerDocument`   | Send a PDF document for processing |
-| `Test-DocDigitizerConnection` | Test API connectivity              |
-| `Get-DocDigitizerConfig`      | View current configuration         |
-| `Set-DocDigitizerConfig`      | Set default configuration values   |
-| `Get-DocDigitizerHelp`        | Show help and usage examples       |
+| Command | Description |
+|---------|-------------|
+| `Send-DocDigitizerDocument` | Process a PDF document |
+| `Test-DocDigitizerConnection` | Test if the API is reachable |
+| `Get-DocDigitizerConfig` | Show current settings |
+| `Set-DocDigitizerConfig` | Change settings |
+| `Get-DocDigitizerHelp` | Show help |
 
-## Usage Examples
+---
 
-### Basic Document Processing
+## Examples
+
+### Basic usage
 
 ```powershell
-# Process a single document (returns JSON)
+# Process a single invoice
 Send-DocDigitizerDocument -FilePath "invoice.pdf"
 
-# Process with specific IDs
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -DocumentId $docId -ContextId $contextId
-```
-
-### Saving Results
-
-```powershell
-# Auto-save to {filename}_extraction.json in same directory
+# Process and save result to JSON file
 Send-DocDigitizerDocument -FilePath "invoice.pdf" -SaveExtraction
-# Creates: invoice_extraction.json
 
-# Save to custom path
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -OutputPath "C:\results\my_result.json"
-
-# Batch process and save all
+# Process all PDFs in a folder
 Get-ChildItem *.pdf | Send-DocDigitizerDocument -SaveExtraction
 ```
 
-### Pipeline Selection
+### Working with results
 
 ```powershell
-# Use a specific pipeline
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -Pipeline "MainPipelineWithOCR"
-
-# Available pipelines (check your server):
-# - MainPipelineWithOCR
-# - MainPipelineWithFile
-# - SingleDocPipelineWithOCR
-# - SingleDocPipelineWithFile
-```
-
-### Response Verbosity
-
-```powershell
-# Minimal response (default) - just essential data
-Send-DocDigitizerDocument -FilePath "invoice.pdf"
-
-# Medium response - includes metadata
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -LogLevel Medium
-
-# Full response - complete execution details
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -LogLevel Full
-
-# Get raw API response
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -PassThru
-```
-
-### Batch Processing
-
-```powershell
-# Process all PDFs in a folder with same context
-$contextId = [guid]::NewGuid()
-Get-ChildItem *.pdf | Send-DocDigitizerDocument -ContextId $contextId
-
-# Process and collect results
-$results = Get-ChildItem *.pdf | Send-DocDigitizerDocument -ContextId $contextId
-$results | Export-Csv -Path "results.csv"
-```
-
-### Health Check
-
-```powershell
-# Detailed connection test
-Test-DocDigitizerConnection
-
-# Output:
-# Url       : http://localhost:5000
-# Connected : True
-# Response  : I am alive
-# Error     :
-# Latency   : 45
-
-# Simple boolean check
-if (Test-DocDigitizerConnection -Quiet) {
-    Send-DocDigitizerDocument -FilePath "invoice.pdf"
-}
-```
-
-## Configuration
-
-### Environment Variables
-
-| Variable                | Description               | Default                 |
-| ----------------------- | ------------------------- | ----------------------- |
-| `DOCDIGITIZER_URL`      | API base URL              | `https://apix.docdigitizer.com/sync` |
-| `DOCDIGITIZER_APIKEY`   | API key for authentication | (built-in default)     |
-| `DOCDIGITIZER_PIPELINE` | Default pipeline name     | (server default)        |
-| `DOCDIGITIZER_LOGLEVEL` | Default log level         | `Minimal`               |
-| `DOCDIGITIZER_TIMEOUT`  | Request timeout (seconds) | `300`                   |
-
-### Setting Configuration
-
-```powershell
-# Set for current session
-Set-DocDigitizerConfig -BaseUrl "https://apix.docdigitizer.com/sync" -Pipeline "MainPipelineWithOCR"
-
-# Persist to PowerShell profile (survives session restarts)
-Set-DocDigitizerConfig -BaseUrl "https://apix.docdigitizer.com/sync" -Persist
-
-# View current configuration
-Get-DocDigitizerConfig
-```
-
-### Using Different Environments
-
-```powershell
-# Development
-Set-DocDigitizerConfig -BaseUrl "http://localhost:5000"
-
-# Production
-Set-DocDigitizerConfig -BaseUrl "https://docingester-prod.example.com"
-
-# One-off call to different server
-Send-DocDigitizerDocument -FilePath "doc.pdf" -BaseUrl "https://other-server.com"
-```
-
-## Output Format
-
-The `Send-DocDigitizerDocument` command returns a **JSON string**:
-
-```json
-{
-  "traceId": "ABC1234",
-  "state": "PROCESSINGX",
-  "pipeline": "MainPipelineWithOCR",
-  "pageCount": 3,
-  "filePath": "C:\\docs\\invoice.pdf",
-  "documentId": "a1b2c3d4-...",
-  "contextId": "e5f6g7h8-...",
-  "output": {
-    "extractions": [...]
-  },
-  "timers": {
-    "DocIngester_Total": 1234.56,
-    "DocWorker_Total": 1200.00
-  }
-}
-```
-
-### Working with JSON output
-
-```powershell
-# Parse JSON to object if needed
+# Get result as JSON
 $json = Send-DocDigitizerDocument -FilePath "invoice.pdf"
+
+# Convert to PowerShell object
 $result = $json | ConvertFrom-Json
 
-# Access specific fields
+# View extractions
 $result.output.extractions
-$result.timers
-
-# Save to file automatically
-Send-DocDigitizerDocument -FilePath "invoice.pdf" -SaveExtraction
 ```
 
-## Error Handling
+### Get more details in response
 
 ```powershell
-# Errors are written to the error stream
-$result = Send-DocDigitizerDocument -FilePath "invalid.pdf" -ErrorAction SilentlyContinue
-if (-not $result) {
-    Write-Host "Processing failed"
-}
+# Minimal response (default)
+Send-DocDigitizerDocument -FilePath "invoice.pdf"
 
-# Or use try/catch with -ErrorAction Stop
-try {
-    $result = Send-DocDigitizerDocument -FilePath "doc.pdf" -ErrorAction Stop
-} catch {
-    Write-Host "Error: $($_.Exception.Message)"
-}
+# Medium - includes metadata
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -LogLevel Medium
+
+# Full - complete execution details
+Send-DocDigitizerDocument -FilePath "invoice.pdf" -LogLevel Full
 ```
 
-## Requirements
-
-- PowerShell 5.1 or later (PowerShell 7+ recommended for better performance)
-- Network access to DocIngester API
+---
 
 ## Troubleshooting
 
-### Connection Issues
+### "git" is not recognized
+
+You need to install Git first:
+1. Download from https://git-scm.com/download/win
+2. Install with default options
+3. Restart PowerShell and try again
+
+### Module not loading
+
+Make sure you're in the correct folder:
 
 ```powershell
-# Test connectivity
+# Check current folder
+Get-Location
+
+# List files to verify dd-cmdlets exists
+Get-ChildItem
+```
+
+### Connection failed
+
+Check your internet connection and try:
+
+```powershell
 Test-DocDigitizerConnection -Verbose
-
-# Check configuration
-Get-DocDigitizerConfig
 ```
 
-### Timeout Issues
+### Timeout on large documents
+
+Increase the timeout (default is 5 minutes):
 
 ```powershell
-# Increase timeout for large documents
 Send-DocDigitizerDocument -FilePath "large.pdf" -TimeoutSec 600
-
-# Or set as default
-Set-DocDigitizerConfig -Timeout 600
 ```
 
-### Debug Mode
+---
 
-```powershell
-# Enable verbose output
-Send-DocDigitizerDocument -FilePath "doc.pdf" -Verbose
-```
+## Requirements
 
-## License
+- Windows PowerShell 5.1 or PowerShell 7+
+- Internet connection
+- Git (for installation)
 
-MIT License - See LICENSE file for details.
+---
+
+## Documentation
+
+- [Installation Guide](installation.html)
+- [Commands Reference](commands.html)
+- [Scripting Examples](examples.html)
+
+---
+
+## Support
+
+For issues or questions, contact DocDigitizer support.

@@ -21,98 +21,113 @@
 
     <h3>Requirements</h3>
     <ul>
-        <li>PowerShell 5.1 or later (PowerShell 7+ recommended for better performance)</li>
-        <li>Network access to DocDigitizer API</li>
+        <li>Windows PowerShell 5.1 or PowerShell 7+</li>
+        <li>Internet connection</li>
+        <li>Git (we'll show you how to install it if needed)</li>
     </ul>
 
-    <h3>Option 1: Clone and Import</h3>
-    <p>Clone the repository and import the module:</p>
-    <pre><code># Clone the repository
-git clone https://github.com/DocDigitizer/dd-cmdlets.git
+    <hr>
 
-# Import the module
-Import-Module ".\dd-cmdlets\DocDigitizer.psd1"</code></pre>
+    <h2>Installation Steps</h2>
 
-    <h3>Option 2: Install to PowerShell Modules Folder</h3>
-    <p>Clone directly to your user modules folder for easier access:</p>
-    <pre><code># Clone directly to user modules folder
-git clone https://github.com/DocDigitizer/dd-cmdlets.git "$env:USERPROFILE\Documents\PowerShell\Modules\DocDigitizer"
+    <h3>Step 1: Open PowerShell</h3>
+    <p>Press <strong>Windows + X</strong> and select <strong>Windows PowerShell</strong> or <strong>Terminal</strong>.</p>
+    <p>Alternatively, search for "PowerShell" in the Start menu.</p>
 
-# Then import (no path needed)
-Import-Module DocDigitizer</code></pre>
+    <h3>Step 2: Check if Git is installed</h3>
+    <p>Type this command and press Enter:</p>
+    <pre><code>git --version</code></pre>
 
-    <h3>Option 3: Download ZIP</h3>
-    <p>Download and extract the module manually:</p>
+    <p><strong>If you see a version number</strong> (like "git version 2.x.x"), Git is installed. Skip to Step 3.</p>
+
+    <p><strong>If you see an error</strong>, you need to install Git:</p>
     <ol>
-        <li>Download from <a href="https://github.com/DocDigitizer/dd-cmdlets/archive/refs/heads/master.zip">GitHub</a></li>
-        <li>Extract to a folder of your choice</li>
-        <li>Import the module:</li>
+        <li>Go to <a href="https://git-scm.com/download/win">https://git-scm.com/download/win</a></li>
+        <li>Download and run the installer</li>
+        <li>Use all default options during installation</li>
+        <li>Close and reopen PowerShell</li>
+        <li>Try <code>git --version</code> again to confirm it works</li>
     </ol>
-    <pre><code>Import-Module "C:\path\to\dd-cmdlets\DocDigitizer.psd1"</code></pre>
 
-    <h3>Verify Installation</h3>
-    <p>After importing, verify the module is loaded:</p>
-    <pre><code># Check available commands
-Get-Command -Module DocDigitizer
+    <h3>Step 3: Choose where to install</h3>
+    <p>Navigate to a folder where you want to keep the module. For example:</p>
+    <pre><code>cd C:\Tools</code></pre>
+    <p>If the folder doesn't exist, create it first:</p>
+    <pre><code>mkdir C:\Tools
+cd C:\Tools</code></pre>
 
-# Test connectivity
-Test-DocDigitizerConnection</code></pre>
+    <h3>Step 4: Download the module</h3>
+    <p>Run this command to download the module:</p>
+    <pre><code>git clone https://github.com/DocDigitizer/dd-cmdlets.git</code></pre>
+    <p>This creates a folder called <code>dd-cmdlets</code> with all the module files.</p>
 
-    <h3>Configuration</h3>
-    <p>The module comes pre-configured with default settings. You can customize using environment variables:</p>
-    <table border="1" cellpadding="5">
-        <thead>
-            <tr>
-                <th>Variable</th>
-                <th>Description</th>
-                <th>Default</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>DOCDIGITIZER_URL</code></td>
-                <td>API base URL</td>
-                <td>https://apix.docdigitizer.com/sync</td>
-            </tr>
-            <tr>
-                <td><code>DOCDIGITIZER_APIKEY</code></td>
-                <td>API key for authentication</td>
-                <td>(built-in default)</td>
-            </tr>
-            <tr>
-                <td><code>DOCDIGITIZER_PIPELINE</code></td>
-                <td>Default pipeline name</td>
-                <td>(server default)</td>
-            </tr>
-            <tr>
-                <td><code>DOCDIGITIZER_LOGLEVEL</code></td>
-                <td>Default log level</td>
-                <td>Minimal</td>
-            </tr>
-            <tr>
-                <td><code>DOCDIGITIZER_TIMEOUT</code></td>
-                <td>Request timeout (seconds)</td>
-                <td>300</td>
-            </tr>
-        </tbody>
-    </table>
+    <h3>Step 5: Import the module</h3>
+    <p>Load the module into PowerShell:</p>
+    <pre><code>Import-Module .\dd-cmdlets\DocDigitizer.psd1</code></pre>
+    <p>You should see this message:</p>
+    <pre><code>[DocDigitizer] Module loaded - 5 commands available</code></pre>
 
-    <h3>Troubleshooting</h3>
+    <h3>Step 6: Test the connection</h3>
+    <p>Verify everything is working:</p>
+    <pre><code>Test-DocDigitizerConnection</code></pre>
+    <p>You should see:</p>
+    <pre><code>Url       : https://apix.docdigitizer.com/sync
+Connected : True
+Response  : I am alive
+Latency   : ...</code></pre>
 
-    <h4>Module Not Found</h4>
-    <p>If you get "module not found" errors, ensure the path is correct:</p>
-    <pre><code># Check if the file exists
-Test-Path "C:\path\to\DocDigitizer.psd1"
+    <h3>Done!</h3>
+    <p>You're ready to process documents. Try this:</p>
+    <pre><code>Send-DocDigitizerDocument -FilePath "C:\path\to\your\document.pdf"</code></pre>
 
-# Use the full path when importing
-Import-Module "C:\full\path\to\DocDigitizer.psd1"</code></pre>
+    <hr>
 
-    <h4>Connection Issues</h4>
-    <pre><code># Test with verbose output
-Test-DocDigitizerConnection -Verbose
+    <h2>Using the Module in Future Sessions</h2>
+    <p>Every time you open a new PowerShell window, you need to import the module again:</p>
+    <pre><code>Import-Module C:\Tools\dd-cmdlets\DocDigitizer.psd1</code></pre>
+    <p><strong>Tip:</strong> Use the full path so you can run it from any folder.</p>
 
-# Check current configuration
-Get-DocDigitizerConfig</code></pre>
+    <hr>
+
+    <h2>Updating the Module</h2>
+    <p>To get the latest version:</p>
+    <pre><code>cd C:\Tools\dd-cmdlets
+git pull</code></pre>
+
+    <hr>
+
+    <h2>Alternative: Download as ZIP</h2>
+    <p>If you can't use Git, you can download the module as a ZIP file:</p>
+    <ol>
+        <li>Go to <a href="https://github.com/DocDigitizer/dd-cmdlets">https://github.com/DocDigitizer/dd-cmdlets</a></li>
+        <li>Click the green <strong>Code</strong> button</li>
+        <li>Click <strong>Download ZIP</strong></li>
+        <li>Extract the ZIP to a folder (e.g., <code>C:\Tools\dd-cmdlets</code>)</li>
+        <li>Import the module:
+            <pre><code>Import-Module C:\Tools\dd-cmdlets\DocDigitizer.psd1</code></pre>
+        </li>
+    </ol>
+
+    <hr>
+
+    <h2>Troubleshooting</h2>
+
+    <h4>"git" is not recognized</h4>
+    <p>Git is not installed. Follow Step 2 above to install it.</p>
+
+    <h4>"The file cannot be loaded because running scripts is disabled"</h4>
+    <p>Run this command to allow scripts:</p>
+    <pre><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></pre>
+    <p>Then try importing the module again.</p>
+
+    <h4>"Could not find module"</h4>
+    <p>Make sure you're in the correct folder. Check with:</p>
+    <pre><code>Get-Location
+Get-ChildItem</code></pre>
+    <p>You should see the <code>dd-cmdlets</code> folder listed.</p>
+
+    <h4>Connection test fails</h4>
+    <p>Check your internet connection and firewall settings. The module needs to reach <code>https://apix.docdigitizer.com</code>.</p>
 
     <hr>
     <p><a href="commands.html">Next: Commands Reference</a></p>
