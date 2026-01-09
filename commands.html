@@ -51,6 +51,12 @@
         </tbody>
     </table>
 
+    <h3>Additional Reference</h3>
+    <ul>
+        <li><a href="#raw-api">Raw HTTP API Reference</a> - For direct API calls without PowerShell</li>
+        <li><a href="#errors">Error Troubleshooting</a> - Common errors and solutions</li>
+    </ul>
+
     <hr>
 
     <h3 id="send-docdigitizerdocument">Send-DocDigitizerDocument</h3>
@@ -273,6 +279,121 @@ TimeoutSource   : Default</code></pre>
 
     <h4>Syntax</h4>
     <pre><code>Get-DocDigitizerHelp</code></pre>
+
+    <hr>
+
+    <h2 id="raw-api">Raw HTTP API Reference</h2>
+    <p>If you need to call the API directly (without PowerShell), here's the specification:</p>
+
+    <h3>Endpoint</h3>
+    <pre><code>POST https://apix.docdigitizer.com/sync</code></pre>
+
+    <h3>Content-Type</h3>
+    <pre><code>multipart/form-data</code></pre>
+    <p><strong>Important:</strong> Do NOT use <code>application/json</code>. The API requires multipart form data.</p>
+
+    <h3>Required Form Fields</h3>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>files</code></td>
+                <td>File</td>
+                <td>The PDF file to process</td>
+            </tr>
+            <tr>
+                <td><code>id</code></td>
+                <td>String</td>
+                <td>Document GUID (e.g., <code>550e8400-e29b-41d4-a716-446655440000</code>)</td>
+            </tr>
+            <tr>
+                <td><code>contextID</code></td>
+                <td>String</td>
+                <td>Context GUID for grouping related documents</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>HTTP Headers</h3>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Header</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>x-api-key</code></td>
+                <td>Yes</td>
+                <td>Your API key (lowercase header name)</td>
+            </tr>
+            <tr>
+                <td><code>X-DD-Pipeline</code></td>
+                <td>No</td>
+                <td>Pipeline name (e.g., <code>MainPipelineWithOCR</code>)</td>
+            </tr>
+            <tr>
+                <td><code>X-DD-LogLevel</code></td>
+                <td>No</td>
+                <td>Response verbosity: <code>Minimal</code>, <code>Medium</code>, or <code>Full</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Example cURL Request</h3>
+    <pre><code>curl -X POST https://apix.docdigitizer.com/sync \
+  -H "x-api-key: your-api-key-here" \
+  -H "X-DD-Pipeline: MainPipelineWithOCR" \
+  -F "files=@invoice.pdf" \
+  -F "id=550e8400-e29b-41d4-a716-446655440000" \
+  -F "contextID=660e8400-e29b-41d4-a716-446655440001"</code></pre>
+
+    <hr>
+
+    <h2 id="errors">Error Troubleshooting</h2>
+
+    <h3>401 Unauthorized</h3>
+    <p><strong>Cause:</strong> Wrong header name or invalid API key.</p>
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Ensure the header is <code>x-api-key</code> (lowercase), not <code>X-DD-ApiKey</code></li>
+        <li>Verify your API key is correct</li>
+        <li>Request a new key at <a href="https://docdigitizer.com/contact">docdigitizer.com/contact</a></li>
+    </ul>
+
+    <h3>415 Unsupported Media Type</h3>
+    <p><strong>Cause:</strong> Using JSON instead of multipart/form-data.</p>
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Use <code>Content-Type: multipart/form-data</code></li>
+        <li>Send the file as a form field, not as JSON</li>
+    </ul>
+
+    <h3>504 Gateway Timeout</h3>
+    <p><strong>Cause:</strong> Document too large or server overloaded.</p>
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Try a smaller document</li>
+        <li>Increase timeout: <code>Send-DocDigitizerDocument -TimeoutSec 600</code></li>
+        <li>Retry after a few minutes</li>
+    </ul>
+
+    <h3>Connection Test Fails</h3>
+    <p><strong>Cause:</strong> Network issues or missing API key.</p>
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Check your internet connection</li>
+        <li>Verify firewall allows access to <code>apix.docdigitizer.com</code></li>
+        <li>Ensure API key is set: <code>Set-DocDigitizerConfig -ApiKey "your-key"</code></li>
+    </ul>
 
     <hr>
     <p><a href="installation.html">Previous: Installation</a> | <a href="examples.html">Next: Scripting Examples</a></p>
