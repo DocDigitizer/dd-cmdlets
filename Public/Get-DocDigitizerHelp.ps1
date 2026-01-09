@@ -174,7 +174,7 @@ function Get-DocDigitizerHelp {
 
     Write-Host "ENVIRONMENT VARIABLES" -ForegroundColor Yellow
     Write-Host "---------------------"
-    Write-Host "  DOCDIGITIZER_URL      - API base URL (default: http://localhost:5000)"
+    Write-Host "  DOCDIGITIZER_URL      - API base URL (default: https://apix.docdigitizer.com/sync)"
     Write-Host "  DOCDIGITIZER_PIPELINE - Default pipeline name"
     Write-Host "  DOCDIGITIZER_LOGLEVEL - Default log level (Minimal/Medium/Full)"
     Write-Host "  DOCDIGITIZER_TIMEOUT  - Request timeout in seconds (default: 300)"

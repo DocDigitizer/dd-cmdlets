@@ -27,8 +27,8 @@ function Send-DocDigitizerDocument {
         - Full: Complete execution details including all plugin outputs
 
     .PARAMETER BaseUrl
-        Base URL of the DocIngester API. Defaults to environment variable
-        DOCDIGITIZER_URL or http://localhost:5000.
+        Base URL of the DocDigitizer API. Defaults to environment variable
+        DOCDIGITIZER_URL or the built-in default (https://apix.docdigitizer.com/sync).
 
     .PARAMETER TimeoutSec
         Request timeout in seconds. Defaults to 300 (5 minutes).

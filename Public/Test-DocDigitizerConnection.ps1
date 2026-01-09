@@ -8,8 +8,8 @@ function Test-DocDigitizerConnection {
         connectivity and service availability.
 
     .PARAMETER BaseUrl
-        Base URL of the DocIngester API. Defaults to environment variable
-        DOCDIGITIZER_URL or http://localhost:5000.
+        Base URL of the DocDigitizer API. Defaults to environment variable
+        DOCDIGITIZER_URL or the built-in default (https://apix.docdigitizer.com/sync).
 
     .PARAMETER Quiet
         Returns only $true or $false instead of detailed status.
