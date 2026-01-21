@@ -1,14 +1,20 @@
 function Send-DocDigitizerDocument {
     <#
     .SYNOPSIS
-        Sends a PDF document to the DocDigitizer API for processing.
+        Sends a document to the DocDigitizer API for processing.
 
     .DESCRIPTION
-        Uploads a PDF file to the DocDigitizer pipeline for OCR, classification,
+        Uploads a PDF or image file to the DocDigitizer pipeline for OCR, classification,
         and data extraction. Returns JSON results from the processing pipeline.
 
+        Supported file types:
+        - PDF files (.pdf)
+        - Image files (.jpg, .jpeg, .png, .tiff, .tif, .bmp, .webp, .gif)
+
+        For OCR-only processing (without data extraction), use -Pipeline "OCROnlyPipeline".
+
     .PARAMETER FilePath
-        Path to the PDF file to process. Accepts pipeline input.
+        Path to the file to process. Accepts PDF and image files. Accepts pipeline input.
 
     .PARAMETER DocumentId
         Unique identifier for the document (GUID). If not provided, a new GUID is generated.
@@ -18,7 +24,10 @@ function Send-DocDigitizerDocument {
 
     .PARAMETER Pipeline
         Name of the pipeline to execute. Overrides the default pipeline.
-        Examples: MainPipelineWithOCR, MainPipelineWithFile
+        Examples: MainPipelineWithOCR, MainPipelineWithFile, OCROnlyPipeline
+
+        OCROnlyPipeline: Returns OCR text, word positions, and line structure without
+        data extraction. Output is in output.documents[] instead of output.extractions[].
 
     .PARAMETER LogLevel
         Response verbosity level. Valid values: Minimal, Medium, Full.
@@ -43,6 +52,11 @@ function Send-DocDigitizerDocument {
     .PARAMETER Depth
         JSON serialization depth. Defaults to 20 for deep nested objects.
 
+    .PARAMETER IncludeRawData
+        When using OCROnlyPipeline, includes detailed raw data in the output:
+        words with bounding boxes, token mappings, raw Google Vision response, and page images.
+        By default, only essential fields (fullText, wordCount, lines, metadata) are returned.
+
     .EXAMPLE
         Send-DocDigitizerDocument -FilePath "invoice.pdf"
 
@@ -63,6 +77,21 @@ function Send-DocDigitizerDocument {
 
         Processes all PDFs and saves each result alongside the original file.
 
+    .EXAMPLE
+        Send-DocDigitizerDocument -FilePath "document.png" -Pipeline "OCROnlyPipeline"
+
+        Performs OCR-only processing on an image file, returning text and word positions.
+
+    .EXAMPLE
+        Send-DocDigitizerDocument -FilePath "scan.jpg" -Pipeline "OCROnlyPipeline" -SaveExtraction
+
+        Performs OCR on a JPEG image and saves the result to scan_extraction.json.
+
+    .EXAMPLE
+        Send-DocDigitizerDocument -FilePath "scan.png" -Pipeline "OCROnlyPipeline" -IncludeRawData
+
+        Performs OCR and includes all raw data (words, bounding boxes, token mappings, page images).
+
     .OUTPUTS
         JSON string containing the extraction results and metadata.
     #>
@@ -72,7 +101,9 @@ function Send-DocDigitizerDocument {
         [Alias('FullName', 'Path')]
         [ValidateScript({
             if (-not (Test-Path $_)) { throw "File not found: $_" }
-            if (-not $_.EndsWith('.pdf', [StringComparison]::OrdinalIgnoreCase)) { throw "File must be a PDF: $_" }
+            $validExtensions = @('.pdf', '.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp', '.webp', '.gif')
+            $ext = [System.IO.Path]::GetExtension($_).ToLower()
+            if ($ext -notin $validExtensions) { throw "Unsupported file type: $_. Supported: PDF, JPEG, PNG, TIFF, BMP, WebP, GIF" }
             $true
         })]
         [string]$FilePath,
@@ -103,7 +134,10 @@ function Send-DocDigitizerDocument {
         [string]$OutputPath,
 
         [Parameter()]
-        [int]$Depth = 20
+        [int]$Depth = 20,
+
+        [Parameter()]
+        [switch]$IncludeRawData
     )
 
     begin {
@@ -173,6 +207,33 @@ function Send-DocDigitizerDocument {
             $pageCount = if ($null -ne $response.numberPages) { $response.numberPages } else { $response.NumberPages }
             $output = if ($response.output) { $response.output } else { $response.Output }
             $timers = if ($response.timers) { $response.timers } else { $response.Timers }
+
+            # Filter out raw data from OCROnlyPipeline output unless explicitly requested
+            if (-not $IncludeRawData -and $output.documents) {
+                foreach ($doc in $output.documents) {
+                    # Remove pageImageBase64
+                    if ($doc.PSObject.Properties['pageImageBase64']) {
+                        $doc.PSObject.Properties.Remove('pageImageBase64')
+                    }
+                    # Remove rawOCRResponse
+                    if ($doc.PSObject.Properties['rawOCRResponse']) {
+                        $doc.PSObject.Properties.Remove('rawOCRResponse')
+                    }
+                    # Remove words array from ocr (keep fullText and wordCount)
+                    if ($doc.ocr -and $doc.ocr.PSObject.Properties['words']) {
+                        $doc.ocr.PSObject.Properties.Remove('words')
+                    }
+                    # Remove tokensByLine and linesByToken from textLines (keep lines)
+                    if ($doc.textLines) {
+                        if ($doc.textLines.PSObject.Properties['tokensByLine']) {
+                            $doc.textLines.PSObject.Properties.Remove('tokensByLine')
+                        }
+                        if ($doc.textLines.PSObject.Properties['linesByToken']) {
+                            $doc.textLines.PSObject.Properties.Remove('linesByToken')
+                        }
+                    }
+                }
+            }
             $pluginExecutions = if ($response.plugin_executions) { $response.plugin_executions } else { $response.PluginExecutions }
 
             $result = [ordered]@{

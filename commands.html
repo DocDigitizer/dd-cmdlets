@@ -73,7 +73,8 @@
     [-TimeoutSec &lt;int&gt;]
     [-SaveExtraction]
     [-OutputPath &lt;string&gt;]
-    [-Depth &lt;int&gt;]</code></pre>
+    [-Depth &lt;int&gt;]
+    [-IncludeRawData]</code></pre>
 
     <h4>Parameters</h4>
     <table border="1" cellpadding="5">
@@ -88,7 +89,7 @@
             <tr>
                 <td><code>-FilePath</code></td>
                 <td>Yes</td>
-                <td>Path to the PDF file to process. Accepts pipeline input.</td>
+                <td>Path to the file to process. Accepts PDF and image files (JPEG, PNG, TIFF, BMP, WebP, GIF). Accepts pipeline input.</td>
             </tr>
             <tr>
                 <td><code>-DocumentId</code></td>
@@ -103,7 +104,7 @@
             <tr>
                 <td><code>-Pipeline</code></td>
                 <td>No</td>
-                <td>Name of the pipeline to execute (e.g., MainPipelineWithOCR, MainPipelineWithFile).</td>
+                <td>Name of the pipeline to execute: <code>MainPipelineWithOCR</code>, <code>MainPipelineWithFile</code>, or <code>OCROnlyPipeline</code>. OCROnlyPipeline returns OCR text without data extraction.</td>
             </tr>
             <tr>
                 <td><code>-LogLevel</code></td>
@@ -135,14 +136,21 @@
                 <td>No</td>
                 <td>JSON serialization depth. Default: 20.</td>
             </tr>
+            <tr>
+                <td><code>-IncludeRawData</code></td>
+                <td>No</td>
+                <td>Include all raw data in OCROnlyPipeline output: words with bounding boxes, token mappings, raw Google Vision response, and page images. By default, only essential fields are returned.</td>
+            </tr>
         </tbody>
     </table>
 
     <h4>Output</h4>
-    <p>Returns a JSON string containing:</p>
+    <p>Returns a JSON string. The structure depends on the pipeline used:</p>
+
+    <h5>Standard Pipelines (MainPipelineWithOCR, etc.)</h5>
     <pre><code>{
   "traceId": "ABC1234",
-  "state": "PROCESSINGX",
+  "state": "PROCESSING",
   "pipeline": "MainPipelineWithOCR",
   "pageCount": 3,
   "filePath": "C:\\docs\\invoice.pdf",
@@ -151,10 +159,39 @@
   "output": {
     "extractions": [...]
   },
-  "timers": {
-    "DocIngester_Total": 1234.56,
-    "DocWorker_Total": 1200.00
-  }
+  "timers": {...}
+}</code></pre>
+
+    <h5>OCROnlyPipeline (default output)</h5>
+    <p><em>By default, only essential fields are returned. Use <code>-IncludeRawData</code> to include words, bounding boxes, token mappings, raw OCR response, and page images.</em></p>
+    <pre><code>{
+  "traceId": "ABC1234",
+  "state": "PROCESSING",
+  "pipeline": "OCROnlyPipeline",
+  "pageCount": 1,
+  "filePath": "C:\\docs\\document.png",
+  "documentId": "a1b2c3d4-...",
+  "contextId": "e5f6g7h8-...",
+  "output": {
+    "documents": [
+      {
+        "pageNumber": 1,
+        "ocr": {
+          "fullText": "Complete extracted text...",
+          "wordCount": 150
+        },
+        "textLines": {
+          "lines": ["Line 1 text", "Line 2 text"]
+        }
+      }
+    ],
+    "metadata": {
+      "numberOfPages": 1,
+      "numberOfWords": 150,
+      "numberOfCharacters": 750
+    }
+  },
+  "timers": {...}
 }</code></pre>
 
     <hr>
@@ -305,7 +342,7 @@ TimeoutSource   : Default</code></pre>
             <tr>
                 <td><code>files</code></td>
                 <td>File</td>
-                <td>The PDF file to process</td>
+                <td>The file to process (PDF or image: JPEG, PNG, TIFF, BMP, WebP, GIF)</td>
             </tr>
             <tr>
                 <td><code>id</code></td>
@@ -355,6 +392,17 @@ TimeoutSource   : Default</code></pre>
   -F "files=@invoice.pdf" \
   -F "id=550e8400-e29b-41d4-a716-446655440000" \
   -F "contextID=660e8400-e29b-41d4-a716-446655440001"</code></pre>
+
+    <h3>OCR-Only Pipeline Example</h3>
+    <p>For OCR-only processing (without data extraction), use the <code>OCROnlyPipeline</code>:</p>
+    <pre><code>curl -X POST https://apix.docdigitizer.com/sync \
+  -H "x-api-key: your-api-key-here" \
+  -H "X-DD-Pipeline: OCROnlyPipeline" \
+  -F "files=@document.png" \
+  -F "id=550e8400-e29b-41d4-a716-446655440003" \
+  -F "contextID=550e8400-e29b-41d4-a716-446655440001"</code></pre>
+    <p><strong>Supported file types:</strong> PDF, JPEG, PNG, TIFF, BMP, WebP, GIF</p>
+    <p><strong>Output:</strong> Returns <code>output.documents[]</code> with OCR text, word positions, line structure, and page images as base64.</p>
 
     <hr>
 

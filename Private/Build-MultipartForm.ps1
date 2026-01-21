@@ -26,12 +26,27 @@ function Build-MultipartForm {
     $fileBytes = [System.IO.File]::ReadAllBytes($FilePath)
     $fileEnc = [System.Text.Encoding]::GetEncoding('ISO-8859-1').GetString($fileBytes)
 
+    # Determine content type based on file extension
+    $ext = [System.IO.Path]::GetExtension($FilePath).ToLower()
+    $contentType = switch ($ext) {
+        '.pdf'  { 'application/pdf' }
+        '.jpg'  { 'image/jpeg' }
+        '.jpeg' { 'image/jpeg' }
+        '.png'  { 'image/png' }
+        '.tiff' { 'image/tiff' }
+        '.tif'  { 'image/tiff' }
+        '.bmp'  { 'image/bmp' }
+        '.webp' { 'image/webp' }
+        '.gif'  { 'image/gif' }
+        default { 'application/octet-stream' }
+    }
+
     $LF = "`r`n"
 
     $bodyLines = @(
         "--$boundary",
         "Content-Disposition: form-data; name=`"files`"; filename=`"$fileName`"",
-        "Content-Type: application/pdf",
+        "Content-Type: $contentType",
         "",
         $fileEnc,
         "--$boundary",

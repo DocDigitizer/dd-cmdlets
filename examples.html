@@ -42,6 +42,55 @@ Set-DocDigitizerConfig -ApiKey "your-api-key-here"</code></pre>
 
     <hr>
 
+    <h2>OCR-Only Processing</h2>
+    <p>Use the <code>OCROnlyPipeline</code> to extract text from images and PDFs without data extraction.</p>
+
+    <h3>Process an image file</h3>
+    <pre><code># Process a PNG image
+Send-DocDigitizerDocument -FilePath "C:\Documents\scan.png" -Pipeline "OCROnlyPipeline"
+
+# Process a JPEG photo
+Send-DocDigitizerDocument -FilePath "C:\Documents\photo.jpg" -Pipeline "OCROnlyPipeline" -SaveExtraction</code></pre>
+    <p>Supported image types: JPEG, PNG, TIFF, BMP, WebP, GIF</p>
+
+    <h3>Access OCR results</h3>
+    <pre><code># Get OCR result
+$json = Send-DocDigitizerDocument -FilePath "document.png" -Pipeline "OCROnlyPipeline"
+$result = $json | ConvertFrom-Json
+
+# Get the full extracted text
+$result.output.documents[0].ocr.fullText
+
+# Get individual words with positions
+$result.output.documents[0].ocr.words
+
+# Get text organized by lines
+$result.output.documents[0].textLines.lines
+
+# Get word count
+$result.output.metadata.numberOfWords</code></pre>
+
+    <h3>Include raw data</h3>
+    <p>By default, only essential fields are returned. Use <code>-IncludeRawData</code> to include all details:</p>
+    <pre><code># Include all raw data in the output
+$json = Send-DocDigitizerDocument -FilePath "document.png" -Pipeline "OCROnlyPipeline" -IncludeRawData
+$result = $json | ConvertFrom-Json
+
+# Now you have access to:
+$result.output.documents[0].ocr.words              # Words with bounding boxes
+$result.output.documents[0].textLines.tokensByLine # Token mappings
+$result.output.documents[0].rawOCRResponse         # Full Google Vision response
+$result.output.documents[0].pageImageBase64        # Page image as base64</code></pre>
+
+    <h3>Process multiple images</h3>
+    <pre><code># Process all images in a folder
+Get-ChildItem "C:\Scans\*.png" | Send-DocDigitizerDocument -Pipeline "OCROnlyPipeline" -SaveExtraction
+
+# Process mixed file types
+Get-ChildItem "C:\Scans\*" -Include *.png,*.jpg,*.pdf | Send-DocDigitizerDocument -Pipeline "OCROnlyPipeline" -SaveExtraction</code></pre>
+
+    <hr>
+
     <h2>Processing Multiple Documents</h2>
 
     <h3>Process all PDFs in a folder</h3>
@@ -69,8 +118,11 @@ $result = $json | ConvertFrom-Json
 # View the trace ID
 $result.traceId
 
-# View extracted data
+# View extracted data (standard pipelines)
 $result.output.extractions
+
+# View OCR documents (OCROnlyPipeline)
+$result.output.documents
 
 # View processing times
 $result.timers</code></pre>

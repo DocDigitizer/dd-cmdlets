@@ -93,6 +93,18 @@ This creates `invoice_extraction.json` in the same folder as your PDF.
 Get-ChildItem "C:\Documents\*.pdf" | Send-DocDigitizerDocument -SaveExtraction
 ```
 
+### OCR-only processing (images and PDFs)
+
+```powershell
+# Process an image file with OCR only
+Send-DocDigitizerDocument -FilePath "C:\Documents\scan.png" -Pipeline "OCROnlyPipeline"
+
+# Process any supported image format
+Send-DocDigitizerDocument -FilePath "photo.jpg" -Pipeline "OCROnlyPipeline" -SaveExtraction
+```
+
+Supported file types: PDF, JPEG, PNG, TIFF, BMP, WebP, GIF
+
 ---
 
 ## Available Commands
@@ -131,8 +143,12 @@ $json = Send-DocDigitizerDocument -FilePath "invoice.pdf"
 # Convert to PowerShell object
 $result = $json | ConvertFrom-Json
 
-# View extractions
+# View extractions (standard pipelines)
 $result.output.extractions
+
+# View OCR documents (OCROnlyPipeline)
+$result.output.documents
+$result.output.documents[0].ocr.fullText
 ```
 
 ### Get more details in response
