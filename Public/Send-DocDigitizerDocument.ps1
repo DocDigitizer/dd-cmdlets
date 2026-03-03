@@ -37,7 +37,7 @@ function Send-DocDigitizerDocument {
 
     .PARAMETER BaseUrl
         Base URL of the DocDigitizer API. Defaults to environment variable
-        DOCDIGITIZER_URL or the built-in default (https://apix.docdigitizer.com/sync).
+        DOCDIGITIZER_URL or the built-in default (https://api.docdigitizer.com/v3/docingester/extract).
 
     .PARAMETER TimeoutSec
         Request timeout in seconds. Defaults to 300 (5 minutes).
@@ -164,7 +164,7 @@ function Send-DocDigitizerDocument {
         # Build headers
         $headers = @{}
         if ($config.ApiKey) {
-            $headers['x-api-key'] = $config.ApiKey
+            $headers['X-API-Key'] = $config.ApiKey
         }
         if ($Pipeline) {
             $headers['X-DD-Pipeline'] = $Pipeline

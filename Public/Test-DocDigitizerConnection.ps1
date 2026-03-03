@@ -9,7 +9,7 @@ function Test-DocDigitizerConnection {
 
     .PARAMETER BaseUrl
         Base URL of the DocDigitizer API. Defaults to environment variable
-        DOCDIGITIZER_URL or the built-in default (https://apix.docdigitizer.com/sync).
+        DOCDIGITIZER_URL or the built-in default (https://api.docdigitizer.com/v3/docingester/extract).
 
     .PARAMETER Quiet
         Returns only $true or $false instead of detailed status.
@@ -57,7 +57,7 @@ function Test-DocDigitizerConnection {
     # Build headers with API key
     $headers = @{}
     if ($config.ApiKey) {
-        $headers['x-api-key'] = $config.ApiKey
+        $headers['X-API-Key'] = $config.ApiKey
     }
 
     try {

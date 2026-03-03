@@ -62,8 +62,8 @@ cd C:\Tools</code></pre>
     <p>This creates a folder called <code>dd-cmdlets</code> with all the module files.</p>
 
     <h3>Step 5: Get your API key</h3>
-    <p>To use the DocDigitizer API, you need an API key. Request one at:</p>
-    <p><strong><a href="https://docdigitizer.com/contact">https://docdigitizer.com/contact</a></strong></p>
+    <p>To use the DocDigitizer API, you need an API key. Get one at:</p>
+    <p><strong><a href="https://customerportal.docdigitizer.com">https://customerportal.docdigitizer.com</a></strong></p>
 
     <h3>Step 6: Import the module</h3>
     <p>Load the module into PowerShell:</p>
@@ -81,7 +81,7 @@ cd C:\Tools</code></pre>
     <p>Verify everything is working:</p>
     <pre><code>Test-DocDigitizerConnection</code></pre>
     <p>You should see:</p>
-    <pre><code>Url       : https://apix.docdigitizer.com/sync
+    <pre><code>Url       : https://api.docdigitizer.com/v3/docingester/extract
 Connected : True
 Response  : I am alive
 Latency   : ...</code></pre>
@@ -138,7 +138,7 @@ Get-ChildItem</code></pre>
     <p>You should see the <code>dd-cmdlets</code> folder listed.</p>
 
     <h4>Connection test fails</h4>
-    <p>Check your internet connection and firewall settings. The module needs to reach <code>https://apix.docdigitizer.com</code>.</p>
+    <p>Check your internet connection and firewall settings. The module needs to reach <code>https://api.docdigitizer.com</code>.</p>
 
     <hr>
     <p><a href="commands.html">Next: Commands Reference</a></p>

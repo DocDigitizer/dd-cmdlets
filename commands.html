@@ -228,7 +228,7 @@
     </table>
 
     <h4>Output</h4>
-    <pre><code>Url       : https://apix.docdigitizer.com/sync
+    <pre><code>Url       : https://api.docdigitizer.com/v3/docingester/extract
 Connected : True
 Response  : I am alive
 Error     :
@@ -243,7 +243,7 @@ Latency   : 45</code></pre>
     <pre><code>Get-DocDigitizerConfig</code></pre>
 
     <h4>Output</h4>
-    <pre><code>BaseUrl         : https://apix.docdigitizer.com/sync
+    <pre><code>BaseUrl         : https://api.docdigitizer.com/v3/docingester/extract
 BaseUrlSource   : Default
 Pipeline        : (not set - will use server default)
 PipelineSource  : Default
@@ -279,7 +279,7 @@ TimeoutSource   : Default</code></pre>
             <tr>
                 <td><code>-ApiKey</code></td>
                 <td>No</td>
-                <td>Your DocDigitizer API key. Get one at <a href="https://docdigitizer.com/contact">docdigitizer.com/contact</a></td>
+                <td>Your DocDigitizer API key. Get one at <a href="https://customerportal.docdigitizer.com">customerportal.docdigitizer.com</a></td>
             </tr>
             <tr>
                 <td><code>-BaseUrl</code></td>
@@ -323,7 +323,7 @@ TimeoutSource   : Default</code></pre>
     <p>If you need to call the API directly (without PowerShell), here's the specification:</p>
 
     <h3>Endpoint</h3>
-    <pre><code>POST https://apix.docdigitizer.com/sync</code></pre>
+    <pre><code>POST https://api.docdigitizer.com/v3/docingester/extract</code></pre>
 
     <h3>Content-Type</h3>
     <pre><code>multipart/form-data</code></pre>
@@ -368,26 +368,41 @@ TimeoutSource   : Default</code></pre>
         </thead>
         <tbody>
             <tr>
-                <td><code>x-api-key</code></td>
-                <td>Yes</td>
-                <td>Your API key (lowercase header name)</td>
+                <td><code>X-API-Key</code></td>
+                <td>Yes (enforced by middleware)</td>
+                <td>API key for authentication. Validated against the BFF.</td>
+            </tr>
+            <tr>
+                <td><code>X-DD-TraceId</code></td>
+                <td>No</td>
+                <td>Client-provided trace ID. If missing, DocIngester generates one.</td>
             </tr>
             <tr>
                 <td><code>X-DD-Pipeline</code></td>
                 <td>No</td>
-                <td>Pipeline name (e.g., <code>MainPipelineWithOCR</code>)</td>
+                <td>Pipeline identifier — selects which YAML pipeline DocWorker runs.</td>
             </tr>
             <tr>
                 <td><code>X-DD-LogLevel</code></td>
                 <td>No</td>
-                <td>Response verbosity: <code>Minimal</code>, <code>Medium</code>, or <code>Full</code></td>
+                <td>Controls response detail level (<code>minimal</code>, <code>normal</code>, <code>verbose</code>).</td>
+            </tr>
+            <tr>
+                <td><code>X-App-Name</code></td>
+                <td>No</td>
+                <td>Identifies the calling application. Used in billing metadata and analytics.</td>
+            </tr>
+            <tr>
+                <td><code>X-DD-*</code></td>
+                <td>No</td>
+                <td>Any other <code>X-DD-</code> prefixed headers are forwarded to DocWorker.</td>
             </tr>
         </tbody>
     </table>
 
     <h3>Example cURL Request</h3>
-    <pre><code>curl -X POST https://apix.docdigitizer.com/sync \
-  -H "x-api-key: your-api-key-here" \
+    <pre><code>curl -X POST https://api.docdigitizer.com/v3/docingester/extract \
+  -H "X-API-Key: your-api-key-here" \
   -H "X-DD-Pipeline: MainPipelineWithOCR" \
   -F "files=@invoice.pdf" \
   -F "id=550e8400-e29b-41d4-a716-446655440000" \
@@ -395,8 +410,8 @@ TimeoutSource   : Default</code></pre>
 
     <h3>OCR-Only Pipeline Example</h3>
     <p>For OCR-only processing (without data extraction), use the <code>OCROnlyPipeline</code>:</p>
-    <pre><code>curl -X POST https://apix.docdigitizer.com/sync \
-  -H "x-api-key: your-api-key-here" \
+    <pre><code>curl -X POST https://api.docdigitizer.com/v3/docingester/extract \
+  -H "X-API-Key: your-api-key-here" \
   -H "X-DD-Pipeline: OCROnlyPipeline" \
   -F "files=@document.png" \
   -F "id=550e8400-e29b-41d4-a716-446655440003" \
@@ -412,9 +427,9 @@ TimeoutSource   : Default</code></pre>
     <p><strong>Cause:</strong> Wrong header name or invalid API key.</p>
     <p><strong>Solution:</strong></p>
     <ul>
-        <li>Ensure the header is <code>x-api-key</code> (lowercase), not <code>X-DD-ApiKey</code></li>
+        <li>Ensure the header is <code>X-API-Key</code></li>
         <li>Verify your API key is correct</li>
-        <li>Request a new key at <a href="https://docdigitizer.com/contact">docdigitizer.com/contact</a></li>
+        <li>Request a new key at <a href="https://customerportal.docdigitizer.com">customerportal.docdigitizer.com</a></li>
     </ul>
 
     <h3>415 Unsupported Media Type</h3>
@@ -439,7 +454,7 @@ TimeoutSource   : Default</code></pre>
     <p><strong>Solution:</strong></p>
     <ul>
         <li>Check your internet connection</li>
-        <li>Verify firewall allows access to <code>apix.docdigitizer.com</code></li>
+        <li>Verify firewall allows access to <code>api.docdigitizer.com</code></li>
         <li>Ensure API key is set: <code>Set-DocDigitizerConfig -ApiKey "your-key"</code></li>
     </ul>
 

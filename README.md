@@ -26,9 +26,9 @@ This creates a `dd-cmdlets` folder with all the module files.
 
 ### Step 4: Get your API key
 
-To use the DocDigitizer API, you need an API key. Request one at:
+To use the DocDigitizer API, you need an API key. Get one at:
 
-**https://docdigitizer.com/contact**
+**https://customerportal.docdigitizer.com**
 
 ### Step 5: Import the module
 
@@ -61,7 +61,7 @@ Test-DocDigitizerConnection
 
 You should see:
 ```
-Url       : https://apix.docdigitizer.com/sync
+Url       : https://api.docdigitizer.com/v3/docingester/extract
 Connected : True
 Response  : I am alive
 Latency   : ...

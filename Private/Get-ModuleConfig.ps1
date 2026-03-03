@@ -10,7 +10,7 @@ function Get-ModuleConfig {
     param()
 
     $config = @{
-        BaseUrl  = if ($env:DOCDIGITIZER_URL) { $env:DOCDIGITIZER_URL } else { "https://apix.docdigitizer.com/sync" }
+        BaseUrl  = if ($env:DOCDIGITIZER_URL) { $env:DOCDIGITIZER_URL } else { "https://api.docdigitizer.com/v3/docingester/extract" }
         ApiKey   = $env:DOCDIGITIZER_APIKEY
         Pipeline = if ($env:DOCDIGITIZER_PIPELINE) { $env:DOCDIGITIZER_PIPELINE } else { $null }
         LogLevel = if ($env:DOCDIGITIZER_LOGLEVEL) { $env:DOCDIGITIZER_LOGLEVEL } else { $null }

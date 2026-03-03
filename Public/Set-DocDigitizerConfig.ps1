@@ -8,7 +8,7 @@ function Set-DocDigitizerConfig {
         environment variables. These persist for the current PowerShell session.
 
     .PARAMETER ApiKey
-        Your DocDigitizer API key. Get one at https://docdigitizer.com/contact
+        Your DocDigitizer API key. Get one at https://customerportal.docdigitizer.com
 
     .PARAMETER BaseUrl
         Default base URL for the DocDigitizer API.
